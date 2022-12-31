@@ -11,6 +11,7 @@ getMovies(API_URL)
 async function getMovies(url){
     const res = await fetch(url)
     const data =await res.json()
+    console.log(data.results)
 
     showMovies(data.results)
 }
@@ -29,9 +30,8 @@ function showMovies(movies){
       <span class="${getClassByRate(vote_average)}">${vote_average}</span>
     </div>
     <div class="overview">
-        <h3>Overview</h3>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Harum mollitia nesciunt commodi ad molestias dicta nisi atque quaerat, ab odio qui officia fugiat corporis 
-        possimus ullam quos placeat repellat distinctio!
+        <h3>Description</h3>
+        ${overview}
     </div>
    
     `
@@ -43,11 +43,11 @@ function showMovies(movies){
 
 function getClassByRate(vote){
   if(vote >= 8){
-    return 'green'
+    return 'lightgreen'
   }else if(vote >= 5){
-    return 'orange'
+    return 'yellow'
   }else{
-    return 'red'
+    return 'orangered'
   }
 }
 //get results
