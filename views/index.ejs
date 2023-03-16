@@ -1,0 +1,45 @@
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/views/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    
+    <title>Movie App</title>
+    <button id="h1">Movie Database</button>
+      <p id="userName">
+        <i class="fa-regular fa-user"></i>
+        <%=userName%></p> 
+  </head>
+  <body>
+    <header>
+      <!-- login -->
+      <section class="modal hidden">
+      <div class="btn-close"></div>
+
+      <form action="" class="" id="case">
+        <div>
+          <a href="/login.html">login</a>
+        </div>
+        <div>
+          <a href="/register.html">register</a>
+        </div>
+        
+      </form>
+    </section>
+      <div class="overlay hidden"></div>
+      <button class="btn btn-open">LogIn</button>
+    </section>
+      <form id="form">
+       <input type="text" id="search" placeholder="Search" > <button id="button"> <i class="fa-sharp fa-solid fa-magnifying-glass fa-1x"></i></button> </input>
+          
+        
+      </form>
+    </header>
+
+    <main id="main"></main>
+   <script src="views/script.js"></script>
+  </body>
+</html>
