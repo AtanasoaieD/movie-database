@@ -7,6 +7,7 @@ var mysql = require("mysql");
 const path = require("path");
 const flash = require("connect-flash");
 const app = express();
+const MemoryStore = require("memorystore")(sessions);
 
 let encodeUrl = parseUrl.urlencoded({ extended: false });
 var con = mysql.createConnection({
@@ -21,7 +22,9 @@ app.use(
   sessions({
     secret: "thisismysecrctekey",
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 24 hours
+    cookie: { maxAge: 86400000 },
+    store: new MemoryStore({ checkPeriod: 86400000 }),
+
     resave: false,
   })
 );
