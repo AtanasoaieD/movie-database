@@ -11,10 +11,10 @@ const MemoryStore = require("memorystore")(sessions);
 
 let encodeUrl = parseUrl.urlencoded({ extended: false });
 var con = mysql.createConnection({
-  host: "localhost",
-  user: "root", // my username
-  password: "", // my password
-  database: "myform",
+  host: " sql7.freesqldatabase.com",
+  user: "sql7609888", // my username
+  password: "Ut2IP5IW4C", // my password
+  database: "users",
 });
 
 //session middleware
@@ -41,10 +41,10 @@ app.use("/", express.static(__dirname));
 
 app.post("/register", encodeUrl, (req, res) => {
   var con = mysql.createConnection({
-    host: "localhost",
-    user: "root", // my username
-    password: "", // my password
-    database: "myform",
+    host: "sql7.freesqldatabase.com",
+    user: "sql7609888", // my username
+    password: "Ut2IP5IW4C", // my password
+    database: "users",
   });
   //get data from html
   var firstName = req.body.firstName;
@@ -147,6 +147,6 @@ app.post("/dashboard", encodeUrl, (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+app.listen(3306, () => {
+  console.log("Server running on port 3306");
 });
