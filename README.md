@@ -1,5 +1,5 @@
 # movie-database
-[live](https://project-movie-database.onrender.com)
+[project-link](https://project-movie-database.onrender.com)
 
 Description:
 This project loads different movies with the help of themoviedb API.
