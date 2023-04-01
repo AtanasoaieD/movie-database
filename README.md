@@ -7,5 +7,6 @@ It has filter and search functionality,and a register and login form.
 
 
 ![img](https://github.com/AtanasoaieD/movie-database/blob/main/mdb1.png)
+![img](https://github.com/AtanasoaieD/movie-database/blob/main/mdb1.png)
 
 
