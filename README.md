@@ -4,7 +4,7 @@
 Description:
 This project loads different movies with the help of themoviedb API.
 It has filter and search functionality,and a register and login form.
-JS,Node,Express, SQLdatabase we're used for making this project. 
+   JS,Node,Express, SQLdatabase we're used for making this project. 
 
 
 ![img](https://github.com/AtanasoaieD/movie-database/blob/main/mdb1.png)
