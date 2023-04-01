@@ -79,7 +79,7 @@ main {
   background-color: #2c7873;
   justify-content: center;
   align-items: start;
-  right: -70px;
+  /* right: -70px; */
 }
 
 .movie img {
@@ -106,6 +106,10 @@ main {
   font-weight: bold;
 }
 
+.vote {
+  height: 50px;
+  width: 50px;
+}
 .movie-info span.lightgreen {
   color: lightgreen;
   font-family: "Anton", sans-serif;
