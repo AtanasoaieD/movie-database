@@ -1,152 +1,128 @@
-const express = require("express");
-const cookieParser = require("cookie-parser");
+var express = require("express");
 const sessions = require("express-session");
-const http = require("http");
-var parseUrl = require("body-parser");
-var mysql = require("mysql");
+var mongoose = require("mongoose");
+var passport = require("passport");
+var bodyParser = require("body-parser");
+var LocalStrategy = require("passport-local");
 const path = require("path");
-const flash = require("connect-flash");
-const app = express();
-const MemoryStore = require("memorystore")(sessions);
+var flash = require("connect-flash");
 
-let encodeUrl = parseUrl.urlencoded({ extended: false });
-var con = mysql.createConnection({
-  host: "sql7.freesqldatabase.com",
-  user: "sql7610226", // my username
-  password: "tbLLyIB25a", // my password
-  database: "sql7610226",
-});
+passportLocalMongoose = require("passport-local-mongoose");
+const User = require("./model/User");
+var app = express();
+app.use(flash());
+require("dotenv").config();
+const connectionString = process.env.DB_STRING;
+mongoose.connect(connectionString);
 
-//session middleware
+app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
-  sessions({
-    secret: "thisismysecrctekey",
-    saveUninitialized: true,
-    cookie: { maxAge: 86400000 },
-    store: new MemoryStore({ checkPeriod: 86400000 }),
-
+  require("express-session")({
+    secret: "Rusty is a dog",
     resave: false,
+    saveUninitialized: false,
   })
 );
-app.use(flash());
-app.use(cookieParser());
-app.set("view engine", "ejs");
-
-app.get("/", (req, res) => {
-  const userName = req.flash("user");
-  res.render("index.ejs", { userName });
-});
 app.use(express.static(path.join(__dirname, "views")));
 app.use("/", express.static(__dirname));
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.post("/register", encodeUrl, (req, res) => {
-  var con = mysql.createConnection({
-    host: "sql7.freesqldatabase.com",
-    user: "sql7610226", // my username
-    password: "tbLLyIB25a", // my password
-    database: "sql7610226",
-  });
-  //get data from html
-  var firstName = req.body.firstName;
-  var lastName = req.body.lastName;
-  var userName = req.body.userName;
-  var password = req.body.password;
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-  con.connect(function (err) {
-    if (err) {
-      console.log(err);
-    }
-    //check if user is registered
-    con.query(
-      `SELECT * FROM users WHERE username = '${userName}' AND password  = '${password}'`,
-      function (err, result) {
-        if (err) {
-          console.log(err);
-        }
-        if (Object.keys(result).length > 0) {
-          res.sendFile(__dirname + "/failReg.html");
-        } else {
-          //creating user page in userPage function
-          function userPage() {
-            // We create a session for the dashboard (user page) page and save the user data to this session:
-            req.session.user = {
-              firstname: firstName,
-              lastname: lastName,
-              username: userName,
-              password: password,
-            };
-
-            res.send(
-              `
-              <link
-              rel="stylesheet"
-              href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-            />
-                      <h3>Hi, ${req.session.user.firstname} ${req.session.user.lastname}</h3>
-                      <a href="/">Home</a>
-
-              `
-            );
-          }
-          // inserting new user data
-          var sql = `INSERT INTO users (firstname, lastname, username, password) VALUES ('${firstName}', '${lastName}', '${userName}', '${password}')`;
-          con.query(sql, function (err, result) {
-            if (err) {
-              console.log(err);
-            } else {
-              // using userPage function for creating user page
-              userPage();
-            }
-          });
-        }
-      }
-    );
-  });
-});
-
-app.get("/login.html", (req, res) => {
-  res.sendFile(__dirname + "/login.html");
+app.get("/", function (req, res) {
   const userName = req.flash("user");
-  res.render("login.html", { userName });
+  res.render("index", { userName });
 });
 
-app.post("/dashboard", encodeUrl, (req, res) => {
-  var userName = req.body.userName;
-  var password = req.body.password;
+app.get("/login", function (req, res) {
+  res.render("login");
+});
+// Showing register form
+app.get("/register", function (req, res) {
+  res.render("register");
+});
 
-  con.connect(function (err) {
-    if (err) {
-      console.log(err);
+// user signup
+app.post("/register", async (req, res) => {
+  try {
+    const existingUser = await User.findOne({
+      username: req.body.userName,
+      password: req.body.password,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+    });
+    if (existingUser) {
+      res.redirect("/failReg.html");
+    } else {
+      //if the user does not exist
+      const user = await User.create({
+        username: req.body.userName,
+        password: req.body.password,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+      });
+
+      res.send(
+        `     <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      />
+          <h3>Hi, ${req.session.user.firstName} ${req.session.user.lastName}</h3>
+                <a href="/">Home</a> `
+      );
     }
-    con.query(
-      `SELECT * FROM users WHERE username = '${userName}' AND password = '${password}'`,
-      function (err, result) {
-        if (err) {
-          console.log(err);
-        }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
 
-        function userPage() {
-          // We create a session for the dashboard (user page) page and save the user data to this session:
-          req.session.user = {
-            firstname: result[0].firstname,
-            lastname: result[0].lastname,
-            username: userName,
-            password: password,
-          };
-          req.flash("user", req.body.userName);
-          res.redirect("/");
-        }
+//Showing login form
+app.get("/login", function (req, res) {
+  res.render("login");
+});
 
-        if (Object.keys(result).length > 0) {
-          userPage();
-        } else {
-          res.sendFile(__dirname + "/failLog.html");
-        }
+//Handling user login
+app.post("/login", async function (req, res) {
+  try {
+    // check if the user exists
+    const user = await User.findOne({ username: req.body.userName });
+    if (user) {
+      //check if password matches
+      const result = req.body.password === user.password;
+      if (result) {
+        req.flash("user", req.body.userName);
+        res.redirect("/");
+      } else {
+        res.status(400).json({ error: "password doesn't match" });
       }
-    );
+    } else {
+      res.status(400).json({ error: "User doesn't exist" });
+    }
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+});
+
+//Handling user logout
+app.get("/logout", function (req, res) {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
   });
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+}
+
+var port = process.env.PORT || 3000;
+app.listen(port, function () {
+  console.log("Server Has Started!");
 });
