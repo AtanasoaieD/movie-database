@@ -8,7 +8,7 @@ It has filter and search functionality,and a register and login form.
 
 
 ![img](https://github.com/AtanasoaieD/movie-database/blob/main/img/mdb1.png)
-![img](https://github.com/AtanasoaieD/movie-database/blob/main/registerform.png)
+![img](https://github.com/AtanasoaieD/movie-database/blob/main/img/registerform.png)
 
 
 [themoviedatabase](https://www.themoviedb.org/).
