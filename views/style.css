@@ -28,7 +28,9 @@ body {
 
   margin: 2;
 }
-
+container {
+  font-size: 10px;
+}
 header {
   padding: 1rem;
   display: flex;

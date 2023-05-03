@@ -9,6 +9,7 @@ var flash = require("connect-flash");
 
 passportLocalMongoose = require("passport-local-mongoose");
 const User = require("./model/User");
+const { request } = require("http");
 var app = express();
 app.use(flash());
 require("dotenv").config();
@@ -46,35 +47,43 @@ app.get("/register", function (req, res) {
   res.render("register");
 });
 
-// user signup
 app.post("/register", async (req, res) => {
   try {
     const existingUser = await User.findOne({
+      $or: [
+        { userName: req.body.userName },
+        { password: req.body.password },
+        { firstName: req.body.firstName },
+        { lastName: req.body.lastName },
+      ],
+    });
+    if (existingUser) {
+      res.sendFile(__dirname + "/views/failReg.html");
+      return;
+    }
+    //if the user does not exist
+
+    const user = await User.create({
       username: req.body.userName,
       password: req.body.password,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
     });
-    if (existingUser) {
-      res.redirect("/failReg.html");
-    } else {
-      //if the user does not exist
-      const user = await User.create({
-        username: req.body.userName,
-        password: req.body.password,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-      });
 
-      res.send(
-        `     <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      />
-          <h3>Hi, ${req.session.user.firstName} ${req.session.user.lastName}</h3>
-                <a href="/">Home</a> `
-      );
-    }
+    return res.send(`
+    
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    />
+    <div>
+    <h2>Welcome ${user.username}</h2>
+  </div>
+  <center>
+    <div>
+      <a href="/" >Home</a>
+    </div>
+  </center>`);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Internal Server Error");
